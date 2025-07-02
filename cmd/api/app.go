@@ -15,10 +15,10 @@ type app struct {
 	bot    *bot.Bot
 }
 
-func NewApp(mux bot.HandlerFunc) (*app, error) {
+func NewApp(option ...bot.Option) (*app, error) {
 	cfg := internal.NewBotConfigure()
 
-	b, err := bot.New(cfg.Token, bot.WithDefaultHandler(mux))
+	b, err := bot.New(cfg.Token, option...)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create bot: %w", err)
@@ -43,10 +43,10 @@ func (app *app) Run(ctx context.Context, cancel context.CancelFunc) {
 		http.ListenAndServe(":"+app.config.Port, app.bot.WebhookHandler())
 	}()
 
-	log.Println("Bot is running...")
+	log.Println("bot is running...")
 	app.bot.StartWebhook(ctx)
 	app.bot.DeleteWebhook(ctx, &bot.DeleteWebhookParams{
 		DropPendingUpdates: true,
 	})
-	log.Println("Bot is stopped")
+	log.Println("bot is stopped")
 }

@@ -7,7 +7,7 @@ tmp_dir = "bin"
   bin = "bin\\app.exe"
   cmd = "go build -mod=vendor -o .\\bin\\app.exe .\\cmd\\api\\"
   delay = 1000
-  exclude_dir = ["assets", "bin", "vendor", "testdata", "web", "scripts", "docs"]
+  exclude_dir = ["assets", "bin", "vendor", "testdata", "web", "scripts", "docs", "log"]
   exclude_file = []
   exclude_regex = ["_test.go"]
   exclude_unchanged = false
