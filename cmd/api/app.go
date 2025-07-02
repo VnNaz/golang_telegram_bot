@@ -5,18 +5,21 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"reflect"
+	"strings"
 
 	"github.com/go-telegram/bot"
-	"github.com/vnam0320/tg_bot/internal"
+	config "github.com/vnam0320/tg_bot/internal/config"
 )
 
 type app struct {
-	config internal.BotConfigure
+	config config.BotConfigure
 	bot    *bot.Bot
+	cmd    map[string]interface{}
 }
 
 func NewApp(option ...bot.Option) (*app, error) {
-	cfg := internal.NewBotConfigure()
+	cfg := config.NewBotConfigure()
 
 	b, err := bot.New(cfg.Token, option...)
 
@@ -27,9 +30,38 @@ func NewApp(option ...bot.Option) (*app, error) {
 	app := &app{
 		config: cfg,
 		bot:    b,
+		cmd:    make(map[string]interface{}),
 	}
+	// to do reflex to register all function with handler
+	app.MountHandler()
 
 	return app, err
+}
+
+func (app *app) MountHandler() {
+	// reflect register handler
+	t := reflect.TypeOf(app)
+	for i := 0; i < t.NumMethod(); i++ {
+		method := t.Method(i)
+
+		if !strings.HasPrefix(method.Name, "Handler") {
+			continue
+		}
+
+		log.Printf("calling method %s\n", method.Name)
+
+		receiver := reflect.ValueOf(app)
+		results := method.Func.Call([]reflect.Value{receiver})
+
+		if val, ok := results[0].Interface().(bot.HandlerFunc); ok {
+			cmd := "/" + strings.TrimLeft(method.Name, "Handler")
+			app.bot.RegisterHandler(bot.HandlerTypeMessageText, cmd, bot.MatchTypeExact, val)
+			app.cmd[cmd] = nil
+			log.Printf("registed handler %s with command %s \n", method.Name, cmd)
+		} else {
+			log.Printf("skip handler %s\n because invalid return type", method.Name)
+		}
+	}
 }
 
 func (app *app) Run(ctx context.Context, cancel context.CancelFunc) {
