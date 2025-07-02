@@ -2,17 +2,37 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 )
 
-func (app *app) HandlerRegisterUser() bot.HandlerFunc {
+func (app *app) HandlerRegister() bot.HandlerFunc {
 	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
+		err := app.store.Users.Register(ctx, update.Message.From)
+		text := "Successfully registed user: " + update.Message.From.Username
+		if err != nil {
+			text = fmt.Sprintf("failed add user: %s", err.Error())
+		}
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: update.Message.Chat.ID,
-			Text:   "Sucessfull registed: " + app.config.Port,
+			Text:   text,
+		})
+	}
+}
+
+func (app *app) HandlerUnregister() bot.HandlerFunc {
+	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
+		err := app.store.Users.Unregister(ctx, update.Message.From)
+		text := "Successfully unregistered user: " + update.Message.From.Username
+		if err != nil {
+			text = fmt.Sprintf("failed unregistered user: %s", err.Error())
+		}
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: update.Message.Chat.ID,
+			Text:   text,
 		})
 	}
 }

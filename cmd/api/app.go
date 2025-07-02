@@ -10,12 +10,14 @@ import (
 
 	"github.com/go-telegram/bot"
 	config "github.com/vnam0320/tg_bot/internal/config"
+	"github.com/vnam0320/tg_bot/internal/storage"
 )
 
 type app struct {
 	config config.BotConfigure
 	bot    *bot.Bot
 	cmd    map[string]interface{}
+	store  *storage.Store
 }
 
 func NewApp(option ...bot.Option) (*app, error) {
@@ -31,6 +33,7 @@ func NewApp(option ...bot.Option) (*app, error) {
 		config: cfg,
 		bot:    b,
 		cmd:    make(map[string]interface{}),
+		store:  storage.NewStore(),
 	}
 	// to do reflex to register all function with handler
 	app.MountHandler()
