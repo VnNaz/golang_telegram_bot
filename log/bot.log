@@ -73,3 +73,45 @@
 2025/07/03 16:28:16 Can't Execute text/template: template: list_task:1:43: executing "list_task" at <.Onwer>: Onwer has arguments but cannot be invoked as function
 2025/07/03 16:28:36 vnam0320 say: /new create chat bot
 2025/07/03 16:28:42 vnam0320 say: /tasks
+2025/07/04 00:00:48 vnam0320 say: /commands
+2025/07/04 00:00:56 vnam0320 say: /new create new bot
+2025/07/04 00:01:04 vnam0320 say: /new improve bot
+2025/07/04 00:01:10 vnam0320 say: /tasks
+2025/07/04 00:01:10 Can't parse text/template: open frontend\list_task.html: The system cannot find the file specified.
+2025/07/04 00:01:43 vnam0320 say: /commands
+2025/07/04 00:01:50 vnam0320 say: /new create new bot
+2025/07/04 00:01:56 vnam0320 say: /new improve bot
+2025/07/04 00:01:59 vnam0320 say: /tasks
+2025/07/04 00:01:59 Can't parse text/template: template: list_task.html:14: unexpected EOF
+2025/07/04 00:03:19 vnam0320 say: /new create new bot
+2025/07/04 00:03:22 vnam0320 say: /tasks
+2025/07/04 00:03:22 Can't Execute text/template: template: list_task.html:2:36: executing "list_task.html" at <.Username>: can't evaluate field Username in type *model.Task
+2025/07/04 00:14:17 vnam0320 say: /commands
+2025/07/04 00:14:22 vnam0320 say: /new create new bot
+2025/07/04 00:14:26 vnam0320 say: /tasks
+2025/07/04 00:14:26 Can't Execute text/template: template: list_task.html:8:21: executing "list_task.html" at <.Assignee.Id>: can't evaluate field Id in type *models.User
+2025/07/04 00:16:31 vnam0320 say: /new create new bot
+2025/07/04 00:16:33 vnam0320 say: /tasks
+2025/07/04 00:16:33 Can't Execute text/template: template: list_task.html:8:21: executing "list_task.html" at <.Assignee.ID>: nil pointer evaluating *models.User.ID
+2025/07/04 00:17:22 vnam0320 say: /new create new bot
+2025/07/04 00:17:24 vnam0320 say: /tasks
+2025/07/04 00:17:24 Can't parse text/template: template: list_task.html:8: unexpected "&" in operand
+2025/07/04 00:18:25 vnam0320 say: /new create new bot
+2025/07/04 00:18:27 vnam0320 say: /tasks
+2025/07/04 00:21:40 vnam0320 say: /new create new bot
+2025/07/04 00:21:42 vnam0320 say: /tasks
+2025/07/04 00:21:42 Can't Execute text/template: template: list_task.html:4:31: executing "list_task.html" at <.Assignee.ID>: nil pointer evaluating *models.User.ID
+2025/07/04 00:23:28 vnam0320 say: /new create new bot
+2025/07/04 00:23:30 vnam0320 say: /tasks
+2025/07/04 00:26:09 vnam0320 say: /new create new bot
+2025/07/04 00:26:11 vnam0320 say: /tasks
+2025/07/04 00:26:52 vnam0320 say: /new create new bot
+2025/07/04 00:26:54 vnam0320 say: /tasks
+2025/07/04 00:27:24 vnam0320 say: /new create new bot
+2025/07/04 00:27:25 vnam0320 say: /tasks
+2025/07/04 00:27:55 vnam0320 say: /new create new bot
+2025/07/04 00:27:58 vnam0320 say: /tasks
+2025/07/04 00:28:04 vnam0320 say: /assign_1
+2025/07/04 00:46:43 vnam0320 say: /new create new bot
+2025/07/04 00:46:45 vnam0320 say: /assign_1
+2025/07/04 00:46:47 vnam0320 say: /tasks

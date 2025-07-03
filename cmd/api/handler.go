@@ -1,15 +1,14 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"regexp"
 	"strings"
-	"text/template"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	templates "github.com/vnam0320/tg_bot/frontend/template"
 )
 
 type HandlerConfiguration struct {
@@ -19,7 +18,7 @@ type HandlerConfiguration struct {
 	handler   bot.HandlerFunc
 }
 
-func (app *app) HandlerRegister() *HandlerConfiguration {
+func (app *app) HandlerRegisterUser() *HandlerConfiguration {
 	return &HandlerConfiguration{
 		cmd:       "/register",
 		matchType: bot.MatchTypeExact,
@@ -37,7 +36,7 @@ func (app *app) HandlerRegister() *HandlerConfiguration {
 	}
 }
 
-func (app *app) HandlerUnregister() *HandlerConfiguration {
+func (app *app) HandlerUnregisterUser() *HandlerConfiguration {
 	return &HandlerConfiguration{
 		cmd:       "/unregister",
 		matchType: bot.MatchTypeExact,
@@ -55,7 +54,7 @@ func (app *app) HandlerUnregister() *HandlerConfiguration {
 	}
 }
 
-func (app *app) HandlerCommands() *HandlerConfiguration {
+func (app *app) HandlerShowCommands() *HandlerConfiguration {
 	return &HandlerConfiguration{
 		cmd:       "/commands",
 		matchType: bot.MatchTypeExact,
@@ -72,7 +71,7 @@ func (app *app) HandlerCommands() *HandlerConfiguration {
 	}
 }
 
-func (app *app) HandlerTasks() *HandlerConfiguration {
+func (app *app) HandlerListAllTasks() *HandlerConfiguration {
 
 	return &HandlerConfiguration{
 		cmd:       "/tasks",
@@ -92,27 +91,24 @@ func (app *app) HandlerTasks() *HandlerConfiguration {
 				})
 			}
 			// example: 1. написать бота by @ivanov
-			var buf bytes.Buffer
-			tmpl, err := template.New("list_task").Parse("{{range .}}{{.Id}}. {{.Description}} by @{{.Onwer.Username}}{{end}}\n")
+			text, err := templates.ListAllTask(&templates.ListAllTaskData{
+				Tasks: tasks,
+				User:  update.Message.From,
+			})
 			if err != nil {
-				logger.Printf("Can't parse text/template: %s\n", err.Error())
-				return
-			}
-			err = tmpl.Execute(&buf, tasks)
-			if err != nil {
-				logger.Printf("Can't Execute text/template: %s\n", err.Error())
-				return
+				logger.Println(err.Error())
+				text = err.Error()
 			}
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: update.Message.Chat.ID,
-				Text:   buf.String(),
+				Text:   text,
 			})
 		},
 	}
 }
 
 // /new XXX YYY ZZZ - создаёт новую задачу
-func (app *app) HandlerNew() *HandlerConfiguration {
+func (app *app) HandlerCreateNewTask() *HandlerConfiguration {
 	re := regexp.MustCompile(`^/new\s+(.+)$`)
 	return &HandlerConfiguration{
 		cmd: "/new вводите задачу",
