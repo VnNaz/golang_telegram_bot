@@ -14,7 +14,6 @@ import (
 var (
 	listTaskPath              = filepath.Join(os.Getenv("TEMPLATE_DIR"), "list_task.html")
 	tmplListTask, errListTask = template.ParseFiles(listTaskPath)
-	buf                       bytes.Buffer
 )
 
 type ListAllTaskData struct {
@@ -23,7 +22,7 @@ type ListAllTaskData struct {
 }
 
 func ListAllTask(data *ListAllTaskData) (string, error) {
-
+	var buf bytes.Buffer
 	if errListTask != nil {
 		return "", fmt.Errorf("can't parse text/template: %s", errListTask.Error())
 	}

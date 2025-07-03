@@ -18,6 +18,7 @@ type Taskstorage interface {
 	Assign(ctx context.Context, u *models.User, taskId int64) (*model.Task, error)
 	GetByOnwer(ctx context.Context, u *models.User) ([]*model.Task, error)
 	GetByAssignee(ctx context.Context, u *models.User) ([]*model.Task, error)
+	GetById(ctx context.Context, id int64) (*model.Task, error)
 	GetAll(ctx context.Context) ([]*model.Task, error)
 	Resolve(ctx context.Context, u *models.User, taskId int64) (*model.Task, error)
 }
@@ -108,6 +109,17 @@ func (store *InMemoryTaskStorage) GetByAssignee(ctx context.Context, u *models.U
 	}
 
 	return result, nil
+}
+
+func (store *InMemoryTaskStorage) GetById(ctx context.Context, id int64) (*model.Task, error) {
+	store.mu.RLock()
+	defer store.mu.RUnlock()
+
+	if task, ok := store.tasks[id]; !ok {
+		return nil, TaskIsNotExist
+	} else {
+		return task, nil
+	}
 }
 
 func (store *InMemoryTaskStorage) GetAll(ctx context.Context) ([]*model.Task, error) {
