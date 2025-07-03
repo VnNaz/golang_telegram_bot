@@ -56,14 +56,26 @@ func (app *app) MountHandler() {
 		receiver := reflect.ValueOf(app)
 		results := method.Func.Call([]reflect.Value{receiver})
 
-		if val, ok := results[0].Interface().(bot.HandlerFunc); ok {
-			cmd := "/" + strings.TrimLeft(method.Name, "Handler")
-			app.bot.RegisterHandler(bot.HandlerTypeMessageText, cmd, bot.MatchTypeExact, val)
-			app.cmd[cmd] = nil
-			log.Printf("registed handler %s with command %s \n", method.Name, cmd)
-		} else {
-			log.Printf("skip handler %s\n because invalid return type", method.Name)
+		if len(results) != 1 {
+			log.Printf("skip handler %s because not enough return value \n", method.Name)
+			continue
 		}
+
+		config, ok := results[0].Interface().(*HandlerConfiguration)
+
+		if !ok {
+			log.Printf("skip handler %s because return value have unexpected types \n", method.Name)
+			continue
+		}
+		// if regexp is passed
+		if config.re != nil {
+			app.bot.RegisterHandlerRegexp(bot.HandlerTypeMessageText, config.re, config.handler)
+		} else {
+			app.bot.RegisterHandler(bot.HandlerTypeMessageText, config.cmd, config.matchType, config.handler)
+		}
+
+		app.cmd[config.cmd] = nil
+		log.Printf("registed handler %s with command %s \n", method.Name, config.cmd)
 	}
 }
 

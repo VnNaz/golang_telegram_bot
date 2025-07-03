@@ -1,54 +1,143 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
+	"text/template"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 )
 
-func (app *app) HandlerRegister() bot.HandlerFunc {
-	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
-		err := app.store.Users.Register(ctx, update.Message.From)
-		text := "Successfully registed user: " + update.Message.From.Username
-		if err != nil {
-			text = fmt.Sprintf("failed add user: %s", err.Error())
-		}
-		b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID: update.Message.Chat.ID,
-			Text:   text,
-		})
+type HandlerConfiguration struct {
+	cmd       string
+	re        *regexp.Regexp
+	matchType bot.MatchType
+	handler   bot.HandlerFunc
+}
+
+func (app *app) HandlerRegister() *HandlerConfiguration {
+	return &HandlerConfiguration{
+		cmd:       "/register",
+		matchType: bot.MatchTypeExact,
+		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
+			err := app.store.Users.Register(ctx, update.Message.From)
+			text := "Пользователь успешно зареган: " + update.Message.From.Username
+			if err != nil {
+				text = fmt.Sprintf("Нельзя загерать пользователя: %s", err.Error())
+			}
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: update.Message.Chat.ID,
+				Text:   text,
+			})
+		},
 	}
 }
 
-func (app *app) HandlerUnregister() bot.HandlerFunc {
-	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
-		err := app.store.Users.Unregister(ctx, update.Message.From)
-		text := "Successfully unregistered user: " + update.Message.From.Username
-		if err != nil {
-			text = fmt.Sprintf("failed unregistered user: %s", err.Error())
-		}
-		b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID: update.Message.Chat.ID,
-			Text:   text,
-		})
+func (app *app) HandlerUnregister() *HandlerConfiguration {
+	return &HandlerConfiguration{
+		cmd:       "/unregister",
+		matchType: bot.MatchTypeExact,
+		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
+			err := app.store.Users.Unregister(ctx, update.Message.From)
+			text := "Пользователь успешно раззареган: " + update.Message.From.Username
+			if err != nil {
+				text = fmt.Sprintf("Нельзя раззагерать пользователя: %s", err.Error())
+			}
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: update.Message.Chat.ID,
+				Text:   text,
+			})
+		},
 	}
 }
 
-func (app *app) HandlerCommands() bot.HandlerFunc {
-	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
+func (app *app) HandlerCommands() *HandlerConfiguration {
+	return &HandlerConfiguration{
+		cmd:       "/commands",
+		matchType: bot.MatchTypeExact,
+		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
+			commands := make([]string, 0, len(app.cmd))
+			for k := range app.cmd {
+				commands = append(commands, k)
+			}
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: update.Message.Chat.ID,
+				Text:   "Все доступные команды:\n" + strings.Join(commands, "\n"),
+			})
+		},
+	}
+}
 
-		commands := make([]string, 0, len(app.cmd))
+func (app *app) HandlerTasks() *HandlerConfiguration {
 
-		for k := range app.cmd {
-			commands = append(commands, k)
-		}
+	return &HandlerConfiguration{
+		cmd:       "/tasks",
+		matchType: bot.MatchTypeExact,
+		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
 
-		b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID: update.Message.Chat.ID,
-			Text:   "Available commands:\n" + strings.Join(commands, "\n"),
-		})
+			tasks, err := app.store.Tasks.GetAll(ctx)
+			if err != nil {
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   fmt.Sprintf("Не возможно получить задачи: %s", err.Error()),
+				})
+			} else if len(tasks) == 0 {
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   "Нет задач",
+				})
+			}
+			// example: 1. написать бота by @ivanov
+			var buf bytes.Buffer
+			tmpl, err := template.New("list_task").Parse("{{range .}}{{.Id}}. {{.Description}} by @{{.Onwer.Username}}{{end}}\n")
+			if err != nil {
+				logger.Printf("Can't parse text/template: %s\n", err.Error())
+				return
+			}
+			err = tmpl.Execute(&buf, tasks)
+			if err != nil {
+				logger.Printf("Can't Execute text/template: %s\n", err.Error())
+				return
+			}
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: update.Message.Chat.ID,
+				Text:   buf.String(),
+			})
+		},
+	}
+}
+
+// /new XXX YYY ZZZ - создаёт новую задачу
+func (app *app) HandlerNew() *HandlerConfiguration {
+	re := regexp.MustCompile(`^/new\s+(.+)$`)
+	return &HandlerConfiguration{
+		cmd: "/new вводите задачу",
+		re:  regexp.MustCompile(`^/new(.*)$`),
+		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
+			matches := re.FindStringSubmatch(update.Message.Text)
+			if len(matches) > 1 {
+				task, err := app.store.Tasks.Create(ctx, update.Message.From, matches[1])
+				if err != nil {
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: update.Message.Chat.ID,
+						Text:   "Не могу добавить задачу в список",
+					})
+				} else {
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: update.Message.Chat.ID,
+						Text:   fmt.Sprintf("Задача \"%s\" создана, id=%d", task.Description, task.Id),
+					})
+				}
+			} else {
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   "Неверная команда, прочекайте здесь /commands",
+				})
+			}
+		},
 	}
 }

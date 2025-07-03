@@ -39,3 +39,37 @@
 2025/07/03 00:36:42 vnam0320 say: /Unregister
 2025/07/03 00:36:44 vnam0320 say: /Unregister
 2025/07/03 00:36:46 vnam0320 say: /Unregister
+2025/07/03 15:30:25 vnam0320 say: /Commands
+2025/07/03 15:30:25 vnam0320 say: /Commands
+2025/07/03 15:30:26 vnam0320 say: /Register
+2025/07/03 15:30:26 vnam0320 say: /Unregister
+2025/07/03 15:30:38 vnam0320 say: /Commands
+2025/07/03 15:30:42 vnam0320 say: /Tasks
+2025/07/03 15:30:44 vnam0320 say: /Tasks
+2025/07/03 15:45:21 vnam0320 say: /commands
+2025/07/03 15:45:22 vnam0320 say: /commands
+2025/07/03 15:45:33 vnam0320 say: /commands
+2025/07/03 15:45:39 vnam0320 say: /register
+2025/07/03 15:45:42 vnam0320 say: /tasks
+2025/07/03 15:45:44 vnam0320 say: /unregister
+2025/07/03 16:01:00 vnam0320 say: /commands
+2025/07/03 16:01:02 vnam0320 say: /commands
+2025/07/03 16:01:04 vnam0320 say: /register
+2025/07/03 16:01:06 vnam0320 say: /register
+2025/07/03 16:01:10 vnam0320 say: /unregister
+2025/07/03 16:01:12 vnam0320 say: /unregister
+2025/07/03 16:01:17 vnam0320 say: /tasks
+2025/07/03 16:24:58 vnam0320 say: /commands
+2025/07/03 16:25:05 vnam0320 say: /new
+2025/07/03 16:25:28 vnam0320 say: asdfads
+2025/07/03 16:26:20 vnam0320 say: /commands
+2025/07/03 16:26:22 vnam0320 say: /new
+2025/07/03 16:26:49 vnam0320 say: /commands
+2025/07/03 16:26:51 vnam0320 say: /new
+2025/07/03 16:27:00 vnam0320 say: /new create chat bot
+2025/07/03 16:27:05 vnam0320 say: /tasks
+2025/07/03 16:28:13 vnam0320 say: /new create chat bot
+2025/07/03 16:28:16 vnam0320 say: /tasks
+2025/07/03 16:28:16 Can't Execute text/template: template: list_task:1:43: executing "list_task" at <.Onwer>: Onwer has arguments but cannot be invoked as function
+2025/07/03 16:28:36 vnam0320 say: /new create chat bot
+2025/07/03 16:28:42 vnam0320 say: /tasks
