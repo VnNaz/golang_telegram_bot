@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	templates "github.com/vnam0320/tg_bot/frontend/template"
+	"github.com/vnam0320/tg_bot/internal/storage"
 )
 
 type HandlerConfiguration struct {
@@ -150,7 +152,7 @@ func (app *app) HandlerAssignTask() *HandlerConfiguration {
 			if len(matches) > 1 {
 				// regexp catch only id is number, so this is alway sucessful, so skip the error
 				taskId, _ := strconv.Atoi(matches[1])
-
+				// check if task is exists
 				task, err := app.store.Tasks.GetById(ctx, int64(taskId))
 
 				switch {
@@ -181,6 +183,55 @@ func (app *app) HandlerAssignTask() *HandlerConfiguration {
 					b.SendMessage(ctx, &bot.SendMessageParams{
 						ChatID: oldAssignee.ID,
 						Text:   fmt.Sprintf("Задача \"%s\" назначена на @%s", task.Description, update.Message.From.Username),
+					})
+				}
+			} else {
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   "Неверная команда, прочекайте здесь /commands",
+				})
+			}
+		},
+	}
+}
+
+func (app *app) HandlerUnassignTask() *HandlerConfiguration {
+	re := regexp.MustCompile(`^/unassign_(\d+)$`)
+	return &HandlerConfiguration{
+		cmd: "/unassign_<id>",
+		re:  re,
+		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
+			matches := re.FindStringSubmatch(update.Message.Text)
+			if len(matches) > 1 {
+				// regexp catch only id is number, so this is alway sucessful, so skip the error
+				taskId, _ := strconv.Atoi(matches[1])
+
+				task, err := app.store.Tasks.Unassign(ctx, update.Message.From, int64(taskId))
+
+				switch {
+				case errors.Is(err, storage.NotYourTask):
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: update.Message.Chat.ID,
+						Text:   "Задача не на вас",
+					})
+				case errors.Is(err, storage.TaskIsNotExist):
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: update.Message.Chat.ID,
+						Text:   fmt.Sprintf("Задача с идентификатором %d не сушествует", taskId),
+					})
+				case err != nil:
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: update.Message.Chat.ID,
+						Text:   fmt.Sprintf("Не могу назначить вам эту задачу: %s", err.Error()),
+					})
+				default:
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: update.Message.Chat.ID,
+						Text:   "Принято",
+					})
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: task.Onwer.ID,
+						Text:   fmt.Sprintf("Задача \"%s\" осталась без исполнителя", task.Description),
 					})
 				}
 			} else {
