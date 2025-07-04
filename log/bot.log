@@ -145,3 +145,63 @@
 2025/07/04 11:46:08 vnam0320 say: /tasks
 2025/07/04 11:46:10 vnam0320 say: /unassign_1
 2025/07/04 11:46:20 vnam0320 say: /tasks
+2025/07/04 12:02:43 vnam0320 say: /assign_1
+2025/07/04 12:02:52 vnam0320 say: /new create new bot
+2025/07/04 12:03:02 vnam0320 say: /tasks
+2025/07/04 12:03:04 vnam0320 say: /assign_1
+2025/07/04 12:03:07 vnam0320 say: /tasks
+2025/07/04 12:03:09 vnam0320 say: /unassign_1
+2025/07/04 12:03:13 vnam0320 say: /tasks
+2025/07/04 12:03:27 vnam0320 say: /new improving bot
+2025/07/04 12:03:29 vnam0320 say: /tasks
+2025/07/04 12:03:32 vnam0320 say: /assign_1
+2025/07/04 12:03:34 vnam0320 say: /assign_2
+2025/07/04 12:03:36 vnam0320 say: /tasks
+2025/07/04 12:04:13 vnam0320 say: /new create new bot
+2025/07/04 12:04:20 vnam0320 say: /new improving
+2025/07/04 12:04:21 vnam0320 say: /tasks
+2025/07/04 12:04:45 vnam0320 say: /new create new bot
+2025/07/04 12:04:52 vnam0320 say: /new impv
+2025/07/04 12:04:54 vnam0320 say: /tasks
+2025/07/04 12:07:25 vnam0320 say: /new create new bot
+2025/07/04 12:07:29 vnam0320 say: /new create new bot
+2025/07/04 12:07:30 vnam0320 say: /tasks
+2025/07/04 12:07:30 can't parse text/template: template: list_task.html:5: illegal number syntax: "-"
+2025/07/04 12:07:50 vnam0320 say: /new create new bot
+2025/07/04 12:07:52 vnam0320 say: /tasks
+2025/07/04 12:07:57 vnam0320 say: /new create new bot
+2025/07/04 12:07:58 vnam0320 say: /tasks
+2025/07/04 12:08:31 vnam0320 say: /new create new bot
+2025/07/04 12:08:33 vnam0320 say: /new create new bot
+2025/07/04 12:08:35 vnam0320 say: /tasks
+2025/07/04 12:08:38 vnam0320 say: /assign_1
+2025/07/04 12:08:41 vnam0320 say: /tasks
+2025/07/04 12:09:03 vnam0320 say: /new create new bot
+2025/07/04 12:09:06 vnam0320 say: /tasks
+2025/07/04 12:09:08 vnam0320 say: /assign_1
+2025/07/04 12:09:10 vnam0320 say: /tasks
+2025/07/04 12:09:30 vnam0320 say: /new create new bot
+2025/07/04 12:09:33 vnam0320 say: /tasks
+2025/07/04 12:09:36 vnam0320 say: /assign_1
+2025/07/04 12:09:37 vnam0320 say: /tasks
+2025/07/04 12:09:47 vnam0320 say: /new create new bot
+2025/07/04 12:09:49 vnam0320 say: /tasks
+2025/07/04 12:09:52 vnam0320 say: /assign_2
+2025/07/04 12:09:55 vnam0320 say: /tasks
+2025/07/04 12:10:00 vnam0320 say: /resolve_1
+2025/07/04 12:11:11 vnam0320 say: /new create new bot
+2025/07/04 12:11:15 vnam0320 say: /new create new bot
+2025/07/04 12:11:17 vnam0320 say: /tasks
+2025/07/04 12:11:29 vnam0320 say: /assign_1
+2025/07/04 12:11:31 vnam0320 say: /tasks
+2025/07/04 12:11:48 vnam0320 say: /tasks
+2025/07/04 12:12:19 vnam0320 say: /new create new bot
+2025/07/04 12:12:22 vnam0320 say: /new create new bot
+2025/07/04 12:12:23 vnam0320 say: /tasks
+2025/07/04 12:12:26 vnam0320 say: /assign_1
+2025/07/04 12:12:29 vnam0320 say: /tasks
+2025/07/04 12:12:36 vnam0320 say: /unassign_1
+2025/07/04 12:12:39 vnam0320 say: /tasks
+2025/07/04 12:12:41 vnam0320 say: /assign_1
+2025/07/04 12:12:43 vnam0320 say: /tasks
+2025/07/04 12:12:55 vnam0320 say: /resolve_1

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -93,6 +94,10 @@ func (app *app) HandlerListAllTasks() *HandlerConfiguration {
 					Text:   "Нет задач",
 				})
 			}
+			// TODO: if in database this can be skipped
+			sort.Slice(tasks, func(i, j int) bool {
+				return tasks[i].Id < tasks[j].Id
+			})
 			// example: 1. написать бота by @ivanov
 			text, err := templates.ListAllTask(&templates.ListAllTaskData{
 				Tasks: tasks,
@@ -222,7 +227,7 @@ func (app *app) HandlerUnassignTask() *HandlerConfiguration {
 				case err != nil:
 					b.SendMessage(ctx, &bot.SendMessageParams{
 						ChatID: update.Message.Chat.ID,
-						Text:   fmt.Sprintf("Не могу назначить вам эту задачу: %s", err.Error()),
+						Text:   fmt.Sprintf("Не могу отменить вам эту задачу: %s", err.Error()),
 					})
 				default:
 					b.SendMessage(ctx, &bot.SendMessageParams{
@@ -232,6 +237,60 @@ func (app *app) HandlerUnassignTask() *HandlerConfiguration {
 					b.SendMessage(ctx, &bot.SendMessageParams{
 						ChatID: task.Onwer.ID,
 						Text:   fmt.Sprintf("Задача \"%s\" осталась без исполнителя", task.Description),
+					})
+				}
+			} else {
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   "Неверная команда, прочекайте здесь /commands",
+				})
+			}
+		},
+	}
+}
+
+func (app *app) HandlerResolveTask() *HandlerConfiguration {
+	re := regexp.MustCompile(`^/resolve_(\d+)$`)
+	return &HandlerConfiguration{
+		cmd: "/resolve_<id>",
+		re:  re,
+		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
+			matches := re.FindStringSubmatch(update.Message.Text)
+			if len(matches) > 1 {
+				// regexp catch only id is number, so this is alway sucessful, so skip the error
+				taskId, _ := strconv.Atoi(matches[1])
+
+				task, err := app.store.Tasks.Resolve(ctx, update.Message.From, int64(taskId))
+
+				switch {
+				case errors.Is(err, storage.NotYourTask):
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: update.Message.Chat.ID,
+						Text:   "Задача не на вас",
+					})
+				case errors.Is(err, storage.TaskIsNotExist):
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: update.Message.Chat.ID,
+						Text:   fmt.Sprintf("Задача с идентификатором %d не сушествует", taskId),
+					})
+				case err != nil:
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: update.Message.Chat.ID,
+						Text:   fmt.Sprintf("Не могу удалить вам эту задачу: %s", err.Error()),
+					})
+				case update.Message.Chat.ID == task.Onwer.ID:
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: update.Message.Chat.ID,
+						Text:   fmt.Sprintf("Задача \"%s\" выполнена", task.Description),
+					})
+				default:
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: update.Message.Chat.ID,
+						Text:   fmt.Sprintf("Задача \"%s\" выполнена", task.Description),
+					})
+					b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: task.Onwer.ID,
+						Text:   fmt.Sprintf("Задача \"%s\" выполнена @%s", task.Description, update.Message.From.Username),
 					})
 				}
 			} else {

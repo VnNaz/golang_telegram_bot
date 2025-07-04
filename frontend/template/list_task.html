@@ -1,15 +1,7 @@
 {{$user := .User}}
 
-{{- range .Tasks}}
-    {{- .Id}}. {{.Description}} by @{{.Onwer.Username}}
-    {{- $isMine := false}}
-    {{- if .Assignee}}
-        {{- $isMine = eq .Assignee.ID $user.ID}}
-    assignee: {{- if $isMine}} я {{- else}}  @{{.Assignee.Username}} {{end}} 
-    {{- end}}
-    {{- if and .Assignee $isMine}}
-    /unassign_{{.Id}} /resolve_{{.Id}}
-    {{- else}}
-    /assign_{{.Id}}
-    {{end}}
-{{- end}}
+{{range .Tasks}}
+{{.Id}}. {{.Description}} by @{{.Onwer.Username}}
+{{$isMine := false}}{{if .Assignee}}{{- $isMine = eq .Assignee.ID $user.ID}}assignee: {{if $isMine}} я {{else}}  @{{.Assignee.Username}} {{end}}{{end}}
+{{if and .Assignee $isMine}} /unassign_{{.Id}} /resolve_{{.Id}} {{else}} /assign_{{.Id}} {{end}}
+{{end}}
