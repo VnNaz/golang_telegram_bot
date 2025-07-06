@@ -20,6 +20,7 @@ type HandlerConfiguration struct {
 	re        *regexp.Regexp
 	matchType bot.MatchType
 	handler   bot.HandlerFunc
+	NotShowed bool
 }
 
 func (app *app) HandlerRegisterUser() *HandlerConfiguration {
@@ -99,7 +100,7 @@ func (app *app) HandlerListAllTasks() *HandlerConfiguration {
 				return tasks[i].Id < tasks[j].Id
 			})
 			// example: 1. написать бота by @ivanov
-			text, err := templates.ListAllTask(&templates.ListAllTaskData{
+			text, err := templates.ListAllTask(&templates.ListTaskData{
 				Tasks: tasks,
 				User:  update.Message.From,
 			})
@@ -150,8 +151,9 @@ func (app *app) HandlerCreateNewTask() *HandlerConfiguration {
 func (app *app) HandlerAssignTask() *HandlerConfiguration {
 	re := regexp.MustCompile(`^/assign_(\d+)$`)
 	return &HandlerConfiguration{
-		cmd: "/assign_<id>",
-		re:  re,
+		cmd:       "/assign_<id>",
+		re:        re,
+		NotShowed: true,
 		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
 			matches := re.FindStringSubmatch(update.Message.Text)
 			if len(matches) > 1 {
@@ -203,8 +205,9 @@ func (app *app) HandlerAssignTask() *HandlerConfiguration {
 func (app *app) HandlerUnassignTask() *HandlerConfiguration {
 	re := regexp.MustCompile(`^/unassign_(\d+)$`)
 	return &HandlerConfiguration{
-		cmd: "/unassign_<id>",
-		re:  re,
+		cmd:       "/unassign_<id>",
+		re:        re,
+		NotShowed: true,
 		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
 			matches := re.FindStringSubmatch(update.Message.Text)
 			if len(matches) > 1 {
@@ -252,8 +255,9 @@ func (app *app) HandlerUnassignTask() *HandlerConfiguration {
 func (app *app) HandlerResolveTask() *HandlerConfiguration {
 	re := regexp.MustCompile(`^/resolve_(\d+)$`)
 	return &HandlerConfiguration{
-		cmd: "/resolve_<id>",
-		re:  re,
+		cmd:       "/resolve_<id>",
+		re:        re,
+		NotShowed: true,
 		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
 			matches := re.FindStringSubmatch(update.Message.Text)
 			if len(matches) > 1 {
@@ -297,6 +301,76 @@ func (app *app) HandlerResolveTask() *HandlerConfiguration {
 				b.SendMessage(ctx, &bot.SendMessageParams{
 					ChatID: update.Message.Chat.ID,
 					Text:   "Неверная команда, прочекайте здесь /commands",
+				})
+			}
+		},
+	}
+}
+
+func (app *app) HandlerShowMyTask() *HandlerConfiguration {
+	return &HandlerConfiguration{
+		cmd:       "/my",
+		matchType: bot.MatchTypeExact,
+		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
+			tasks, err := app.store.Tasks.GetByAssignee(ctx, update.Message.From)
+			switch {
+			case err != nil:
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   fmt.Sprintf("Невозможно получить ваши задачи: %s", err.Error()),
+				})
+			case len(tasks) == 0:
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   "У вас нет задачи",
+				})
+			default:
+				text, err := templates.ListMyTask(&templates.ListTaskData{
+					Tasks: tasks,
+					User:  update.Message.From,
+				})
+				if err != nil {
+					logger.Println(err.Error())
+					text = err.Error()
+				}
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   text,
+				})
+			}
+		},
+	}
+}
+
+func (app *app) HandlerShowOwnerTask() *HandlerConfiguration {
+	return &HandlerConfiguration{
+		cmd:       "/owner",
+		matchType: bot.MatchTypeExact,
+		handler: func(ctx context.Context, b *bot.Bot, update *models.Update) {
+			tasks, err := app.store.Tasks.GetByOnwer(ctx, update.Message.From)
+			switch {
+			case err != nil:
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   fmt.Sprintf("Невозможно получить ваши задачи: %s", err.Error()),
+				})
+			case len(tasks) == 0:
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   "У вас нет задачи",
+				})
+			default:
+				text, err := templates.ListOwnerTask(&templates.ListTaskData{
+					Tasks: tasks,
+					User:  update.Message.From,
+				})
+				if err != nil {
+					logger.Println(err.Error())
+					text = err.Error()
+				}
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   text,
 				})
 			}
 		},

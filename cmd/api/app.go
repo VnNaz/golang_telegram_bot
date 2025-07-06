@@ -74,7 +74,9 @@ func (app *app) MountHandler() {
 			app.bot.RegisterHandler(bot.HandlerTypeMessageText, config.cmd, config.matchType, config.handler)
 		}
 
-		app.cmd[config.cmd] = nil
+		if !config.NotShowed {
+			app.cmd[config.cmd] = nil
+		}
 		log.Printf("registed handler %s with command %s \n", method.Name, config.cmd)
 	}
 }

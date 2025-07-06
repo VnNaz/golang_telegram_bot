@@ -88,8 +88,9 @@ func (store *InMemoryTaskStorage) Unassign(ctx context.Context, u *models.User, 
 func (store *InMemoryTaskStorage) GetByOnwer(ctx context.Context, u *models.User) ([]*model.Task, error) {
 	store.mu.RLock()
 	defer store.mu.RUnlock()
-	var result []*model.Task
+	result := make([]*model.Task, 0)
 	for _, v := range store.tasks {
+		// always have owner
 		if v.Onwer.ID == u.ID {
 			result = append(result, v)
 		}
@@ -101,9 +102,9 @@ func (store *InMemoryTaskStorage) GetByOnwer(ctx context.Context, u *models.User
 func (store *InMemoryTaskStorage) GetByAssignee(ctx context.Context, u *models.User) ([]*model.Task, error) {
 	store.mu.RLock()
 	defer store.mu.RUnlock()
-	var result []*model.Task
+	result := make([]*model.Task, 0)
 	for _, v := range store.tasks {
-		if v.Assignee.ID == u.ID {
+		if v.Assignee != nil && v.Assignee.ID == u.ID {
 			result = append(result, v)
 		}
 	}
@@ -125,7 +126,7 @@ func (store *InMemoryTaskStorage) GetById(ctx context.Context, id int64) (*model
 func (store *InMemoryTaskStorage) GetAll(ctx context.Context) ([]*model.Task, error) {
 	store.mu.RLock()
 	defer store.mu.RUnlock()
-	var result []*model.Task
+	result := make([]*model.Task, 0)
 	for _, v := range store.tasks {
 		result = append(result, v)
 	}

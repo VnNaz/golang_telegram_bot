@@ -1,0 +1,6 @@
+{{$user := .User}}
+
+{{range .Tasks}}
+{{.Id}}. {{.Description}} by @{{.Onwer.Username}}
+/unassign_{{.Id}} /resolve_{{.Id}}
+{{end}}
